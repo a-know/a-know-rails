@@ -57,3 +57,4 @@ gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]
 
 # for my application
 gem 'mackerel-client'
+gem 'google-api-client', '~> 0.8.6'

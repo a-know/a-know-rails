@@ -1,6 +1,7 @@
 require 'net/http'
 require 'rexml/document'
 require 'mackerel/client'
+require 'google/api_client'
 
 class BlogMetricsController < ActionController::API
   BLOG_URL = ENV["BOOKMARK_COUNT_BLOG_URL"].freeze
@@ -81,6 +82,50 @@ EOS
         { name: ENV["HATEBLO_SUBSCRIBERS_COUNT_METRIC_NAME"], time: post_time, value: hateblo_subscribers },
       ])
 
+    head 200
+  end
+
+  # see https://github.com/a-know/a-know-dashing/blob/master/jobs/visitor_count_real_time.rb
+  def count_active_visitors
+    # Update these to match your own apps credentials
+    service_account_email = ENV['SERVICE_ACCOUNT_EMAIL'] # Email of service account
+    profile_id = ENV['PROFILE_ID'] # Analytics profile ID.
+
+    # Get the Google API client
+    client = Google::APIClient.new(
+      :application_name => ENV['APPLICATION_NAME'],
+      :application_version => '0.01'
+    )
+
+    key = OpenSSL::PKey::RSA.new(ENV['GOOGLE_API_KEY'].gsub("\\n", "\n"))
+    client.authorization = Signet::OAuth2::Client.new(
+      :token_credential_uri => 'https://accounts.google.com/o/oauth2/token',
+      :audience             => 'https://accounts.google.com/o/oauth2/token',
+      :scope                => 'https://www.googleapis.com/auth/analytics.readonly',
+      :issuer               => service_account_email,
+      :signing_key          => key,
+    )
+
+    # Request a token for our service account
+    client.authorization.fetch_access_token!
+
+    # Get the analytics API
+    analytics = client.discovered_api('analytics','v3')
+
+    # Execute the query, get the value `[["1"]]`
+    response = client.execute(:api_method => analytics.data.realtime.get, :parameters => {
+      'ids' => "ga:" + profile_id,
+      'metrics' => "ga:activeVisitors",
+    }).data.rows
+
+    number = response.empty? ? 0 : response.first.first.to_i
+
+    mackerel = Mackerel::Client.new(mackerel_api_key: ENV["MACKEREL_API_KEY"])
+    mackerel.post_service_metrics(ENV["ACTIVE_VISITOR_SERVICE_NAME"], [{
+        name: ENV["ACTIVE_VISITOR_METRIC_NAME"],
+        time: Time.now.to_i,
+        value: number
+    }])
     head 200
   end
 
