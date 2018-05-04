@@ -3,7 +3,7 @@ require 'rexml/document'
 require 'mackerel/client'
 
 class BlogMetricsController < ActionController::API
-  BLOG_URL = 'http://blog.a-know.me/'.freeze
+  BLOG_URL = ENV["BOOKMARK_COUNT_BLOG_URL"].freeze
 
   DUMMY_UA = 'Opera/9.80 (Windows NT 5.1; U; ja) Presto/2.7.62 Version/11.01'.freeze
 
