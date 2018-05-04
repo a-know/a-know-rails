@@ -21,3 +21,9 @@ a-know's utility rails project
 - `heroku config:add FEEDLY_HATEBLO_SUBSCRIBERS_COUNT_METRIC_NAME="xxx"`
 - `heroku config:add FEEDLY_HATEBLO_RSS_SUBSCRIBERS_COUNT_METRIC_NAME="xxx"`
 - `heroku config:add HATEBLO_SUBSCRIBERS_COUNT_METRIC_NAME="xxx"`
+- `heroku config:add SERVICE_ACCOUNT_EMAIL="xxx@developer.gserviceaccount.com"`
+- `heroku config:add PROFILE_ID="11111111"`
+- `heroku config:add APPLICATION_NAME="xxx"`
+- `heroku config:add ACTIVE_VISITOR_SERVICE_NAME="xxx"`
+- `heroku config:add ACTIVE_VISITOR_METRIC_NAME="xxx"`
+- `heroku config:add GOOGLE_API_KEY="-----BEGIN RSA PRIVATE KEY-----\nxxx\n-----END RSA PRIVATE KEY-----"`
