@@ -49,6 +49,8 @@ EOS
   end
 
   def count_subscribers
+    head 200 unless every_15min?
+
     ldr_hateda = ldr_check(Net::HTTP.get(URI.parse(LDR_ENDPOINT + HATEDA_RSS)).to_i)
     ldr_hateblo_feed = ldr_check(Net::HTTP.get(URI.parse(LDR_ENDPOINT + HATEBLO_FEED)).to_i)
     ldr_hateblo_rss  = ldr_check(Net::HTTP.get(URI.parse(LDR_ENDPOINT + HATEBLO_RSS)).to_i)
@@ -89,7 +91,6 @@ EOS
 
   # see https://github.com/a-know/a-know-dashing/blob/master/jobs/visitor_count_real_time.rb
   def count_active_visitors
-    head 200 unless every_15min?
 
     # Update these to match your own apps credentials
     service_account_email = ENV['SERVICE_ACCOUNT_EMAIL'] # Email of service account
