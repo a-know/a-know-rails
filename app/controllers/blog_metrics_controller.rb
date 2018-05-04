@@ -16,7 +16,7 @@ class BlogMetricsController < ActionController::API
   DUMMY_UA = 'Opera/9.80 (Windows NT 5.1; U; ja) Presto/2.7.62 Version/11.01'.freeze
 
   def count_bookmarks
-    head 200 unless every_15min?
+    head 204 unless every_15min?
 
     response = Net::HTTP.new('b.hatena.ne.jp').start do |http|
       request = <<EOS
@@ -51,7 +51,7 @@ EOS
   end
 
   def count_subscribers
-    head 200 unless every_15min?
+    head 204 unless every_15min?
 
     ldr_hateda = ldr_check(Net::HTTP.get(URI.parse(LDR_ENDPOINT + HATEDA_RSS)).to_i)
     ldr_hateblo_feed = ldr_check(Net::HTTP.get(URI.parse(LDR_ENDPOINT + HATEBLO_FEED)).to_i)
