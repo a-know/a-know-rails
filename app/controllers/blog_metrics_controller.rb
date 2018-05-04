@@ -16,6 +16,8 @@ class BlogMetricsController < ActionController::API
   DUMMY_UA = 'Opera/9.80 (Windows NT 5.1; U; ja) Presto/2.7.62 Version/11.01'.freeze
 
   def count_bookmarks
+    head 200 unless every_15min?
+
     response = Net::HTTP.new('b.hatena.ne.jp').start do |http|
       request = <<EOS
 <?xml version="1.0"?>
