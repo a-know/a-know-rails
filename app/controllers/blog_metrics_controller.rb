@@ -4,6 +4,8 @@ require 'mackerel/client'
 require 'google/api_client'
 
 class BlogMetricsController < ActionController::API
+  SEND_FREQUENCY_MIN = 15
+
   BLOG_URL = ENV["BOOKMARK_COUNT_BLOG_URL"].freeze
   HATEDA_RSS = (ENV["SUBSCRIBERS_HATEDA_URL"] + 'rss').freeze
   HATEBLO_FEED = (ENV["BOOKMARK_COUNT_BLOG_URL"] + 'feed').freeze
@@ -87,6 +89,8 @@ EOS
 
   # see https://github.com/a-know/a-know-dashing/blob/master/jobs/visitor_count_real_time.rb
   def count_active_visitors
+    head 200 unless every_15min?
+
     # Update these to match your own apps credentials
     service_account_email = ENV['SERVICE_ACCOUNT_EMAIL'] # Email of service account
     profile_id = ENV['PROFILE_ID'] # Analytics profile ID.
@@ -130,6 +134,11 @@ EOS
   end
 
   private
+
+  def every_15min?
+    min = DateTime.now.min
+    min % SEND_FREQUENCY_MIN == 0
+  end
 
   def ldr_check(count)
     count < 0 ? 0 : count
