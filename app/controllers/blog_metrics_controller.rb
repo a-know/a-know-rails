@@ -15,6 +15,15 @@ class BlogMetricsController < ActionController::API
 
   DUMMY_UA = 'Opera/9.80 (Windows NT 5.1; U; ja) Presto/2.7.62 Version/11.01'.freeze
 
+  def test
+    logger.info params
+    head 200
+  end
+
+  def params
+    @params ||= JSON.parse(request.body.read, {symbolize_names: true})
+  end
+
   def count_bookmarks
     unless every_15min?
       head 204
