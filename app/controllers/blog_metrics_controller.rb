@@ -28,28 +28,7 @@ class BlogMetricsController < ActionController::API
     unless every_15min?
       head 204
     else
-      response = Net::HTTP.new('b.hatena.ne.jp').start do |http|
-        request = <<EOS
-<?xml version="1.0"?>
-<methodCall>
-  <methodName>bookmark.getTotalCount</methodName>
-  <params>
-    <param>
-      <value><string>#{BLOG_URL}</string></value>
-    </param>
-  </params>
-</methodCall>
-EOS
-        header = {
-          'Content-Type'   => 'text/xml; charset=utf-8',
-          'Content-Length' => request.bytesize.to_s,
-          'User-Agent'     => DUMMY_UA,
-        }
-        http.request_post('/xmlrpc', request, header)
-      end
-
-      doc = REXML::Document.new(response.body)
-      bookmark_count = doc.elements['/methodResponse/params/param/value/int'].text.to_i
+      bookmark_count = JSON.parse(Net::HTTP.get(URI.parse('http://api.b.st-hatena.com/entry.total_count?url=http%3A%2F%2Fblog.a-know.me%2F')))['total_bookmarks'].to_i
 
       mackerel = Mackerel::Client.new(mackerel_api_key: ENV["MACKEREL_API_KEY"])
       mackerel.post_service_metrics(ENV["BOOKMARK_COUNT_SERVICE_NAME"], [{
