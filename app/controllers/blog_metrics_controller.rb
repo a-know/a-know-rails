@@ -34,7 +34,7 @@ class BlogMetricsController < ActionController::API
       mackerel.post_service_metrics(ENV["BOOKMARK_COUNT_SERVICE_NAME"], [{
           name: ENV["BOOKMARK_COUNT_METRIC_NAME"],
           time: Time.now.to_i,
-          value: bookmark_count
+          value: bookmark_count + 8 # ブクマ総数APIの新旧でカウント方法が異なるため
       }])
       head 200
     end
